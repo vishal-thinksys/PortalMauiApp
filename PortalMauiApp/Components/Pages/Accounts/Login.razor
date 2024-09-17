@@ -1,0 +1,82 @@
+﻿@page "/Login"
+@inject PortalMauiApp.Services.IAccountService account
+<AuthorizeView>
+    <Authorized>
+        <div class="alert alert-success">You're logged in as @context.User.Identity?.Name.</div>
+    </Authorized>
+    <NotAuthorized>
+        @if (errors)
+        {
+            @foreach (var error in errorList)
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+        }
+        <form class="modal-content animate">
+            <div class="container">
+                <label for="email">
+                    Email:
+                </label>
+                <input required id="email" name="emailInput" placeholder="Enter your email address" type="email" @bind-value="email" />
+                <label for="password">
+                    Password:
+                </label>
+                <input required id="password" name="passwordInput" placeholder="Enter your password" type="password" @bind-value="password" />
+                <button class="btn btn-primary" @onclick="DoLoginAsync">Login</button>
+            </div>
+            <div class="container" style="background-color:#f1f1f1">
+                <span class="psw">Forgot <a href="#">password?</a></span>
+            </div>
+        </form>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool success, errors;
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private string[] errorList = [];
+
+    public async Task DoLoginAsync()
+    {
+        success = errors = false;
+        errorList = [];
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            errors = true;
+            errorList = ["Email is required."];
+
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            errors = true;
+            errorList = ["Password is required."];
+
+            return;
+        }
+
+        // if (!(email.Equals("abc@abc.com") && password.Equals("123")))
+        // {
+        //     errors = true;
+        //     errorList = ["Please Register your account!"];
+
+        //     return;
+        // }
+
+        var result = account.LoginAsync(email, password);
+
+        if (result == true)
+        {
+            success = true;
+            email = password = string.Empty;
+        }
+        else
+        {
+            errors = true;
+            //errorList = result.ErrorList;
+        }
+    }
+}

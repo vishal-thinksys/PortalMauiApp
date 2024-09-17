@@ -1,0 +1,54 @@
+﻿@inherits LayoutComponentBase
+@inject PortalMauiApp.Services.IAccountService account
+@inject NavigationManager navigationManager
+
+<div class="page">
+    <AuthorizeView>
+        <Authorized>
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+
+            <main>
+                <div class="top-row px-4">
+                    Logged in as @context.User.Identity?.Name.
+                    <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+                    <a href="#" @onclick="Register">Register</a>
+                    <a href="#" @onclick="Logout">Logout</a>
+                </div>
+
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
+        </Authorized>
+        <NotAuthorized>
+            <PortalMauiApp.Components.Pages.Accounts.Login />
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+    private async Task Logout()
+    {
+        // Clear user preferences or any stored data
+        Preferences.Clear();
+
+        // Optionally, you can also call the account logout logic here
+        await account.LogoutAsync();
+
+        // Redirect the user to the login page after logout
+        navigationManager.NavigateTo("/login", true);
+    }
+    private async Task Register()
+    {
+        // Redirect the user to the login page after logout
+        navigationManager.NavigateTo("/Register", true);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialization logic, if any
+        await base.OnInitializedAsync();
+    }
+}
