@@ -17,9 +17,27 @@ namespace PortalMauiApp.Data
 
             try
             {
-                conn = new SQLiteConnection("C:\\Users\\kumar.vishal\\source\\repos\\PortalMauiApp\\PortalMauiApp\\Data\\DapperDB.db3");
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string filePath = Path.Combine(documentsPath, "DapperDB.db3");
+                if (!File.Exists(filePath))
+                {
+                    File.Create(filePath);
+                }
+                conn = new SQLiteConnection(filePath);
                 conn.CreateTable<UserRoles>();
                 conn.CreateTable<UserCredentials>();
+
+                var existingUser = conn.Table<UserCredentials>();
+                if (existingUser == null || existingUser.Count() < 1)
+                {
+                    var userCredentials = new UserCredentials
+                    {
+                        UserName = "vis.kumar1503@gmail.com",
+                        Password = "1234" // Consider hashing the password in a real-world app
+                    };
+                    conn.Insert(userCredentials);
+                }
+
             }
             catch (Exception)
             {
